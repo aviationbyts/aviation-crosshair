@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -75,19 +74,19 @@ namespace AviationCrosshair
 
         private bool _forceExit = false;
 
-        private Icon LoadAppIcon()
+        private System.Drawing.Icon LoadAppIcon()
         {
             try
             {
                 var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
                 if (!string.IsNullOrEmpty(exePath))
                 {
-                    var icon = Icon.ExtractAssociatedIcon(exePath);
+                    var icon = System.Drawing.Icon.ExtractAssociatedIcon(exePath);
                     if (icon != null) return icon;
                 }
             }
             catch { /* fall through to default */ }
-            return SystemIcons.Application;
+            return System.Drawing.SystemIcons.Application;
         }
 
         // ===================================================================
@@ -109,7 +108,7 @@ namespace AviationCrosshair
                     Width = 22,
                     Height = 22,
                     Margin = new Thickness(0, 0, 6, 6),
-                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)),
+                    Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex)),
                     BorderBrush = System.Windows.Media.Brushes.Black,
                     BorderThickness = new Thickness(1),
                     Tag = hex,
@@ -381,7 +380,7 @@ namespace AviationCrosshair
                 Source = drawingImage,
                 Width = Math.Max(1, group.Bounds.Width + 60),
                 Height = Math.Max(1, group.Bounds.Height + 60),
-                RenderTransformOrigin = new Point(0.5, 0.5)
+                RenderTransformOrigin = new System.Windows.Point(0.5, 0.5)
             };
             Canvas.SetLeft(img, PreviewCanvas.ActualWidth / 2 - img.Width / 2);
             Canvas.SetTop(img, PreviewCanvas.ActualHeight / 2 - img.Height / 2);
@@ -399,7 +398,7 @@ namespace AviationCrosshair
             PreviewGridCanvas.Children.Clear();
             double w = PreviewGridCanvas.ActualWidth <= 0 ? 700 : PreviewGridCanvas.ActualWidth;
             double h = PreviewGridCanvas.ActualHeight <= 0 ? 260 : PreviewGridCanvas.ActualHeight;
-            var brush = new SolidColorBrush(Color.FromArgb(30, 255, 255, 255) is var _ ? System.Windows.Media.Color.FromArgb(20, 255, 255, 255) : System.Windows.Media.Colors.Gray);
+            var brush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(20, 255, 255, 255));
             for (double x = 0; x < w; x += 40)
             {
                 var line = new System.Windows.Shapes.Line { X1 = x, Y1 = 0, X2 = x, Y2 = h, Stroke = brush, StrokeThickness = 1 };

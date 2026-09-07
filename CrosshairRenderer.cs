@@ -52,8 +52,8 @@ namespace AviationCrosshair.Core
 
                 // Shape overlay (circle / square / diamond / brackets / hexagon / circle+cross)
                 double half = s.Size / 2.0;
-                Pen shapePen = mainPen;
-                Pen shapeOutlinePen = outlinePen;
+                Pen? shapePen = mainPen;
+                Pen? shapeOutlinePen = outlinePen;
 
                 switch (s.Shape)
                 {
