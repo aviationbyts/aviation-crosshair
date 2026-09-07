@@ -1,0 +1,271 @@
+<Window x:Class="AviationCrosshair.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Aviation Crosshair"
+        Height="720" Width="1180" MinHeight="600" MinWidth="980"
+        WindowStartupLocation="CenterScreen"
+        StateChanged="MainWindow_StateChanged"
+        Closing="MainWindow_Closing">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="190"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ================= SIDEBAR ================= -->
+        <Border Grid.Column="0" Background="{StaticResource BgDarkestBrush}" BorderBrush="{StaticResource BorderBrush2}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="16,18,16,20">
+                    <TextBlock Text="AVIATION" FontSize="15" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                    <TextBlock Text="CROSSHAIR" FontSize="15" FontWeight="Bold"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="0,4,0,0">
+                    <Button x:Name="NavCrosshairs" Content="Crosshairs" Style="{StaticResource SidebarButtonActive}" Click="NavButton_Click"/>
+                    <Button x:Name="NavFavorites" Content="Favorites" Style="{StaticResource SidebarButton}" Click="NavButton_Click"/>
+                    <Button x:Name="NavCustom" Content="Custom" Style="{StaticResource SidebarButton}" Click="NavButton_Click"/>
+                    <Button x:Name="NavProfiles" Content="Profiles" Style="{StaticResource SidebarButton}" Click="NavButton_Click"/>
+                    <Button x:Name="NavSettings" Content="Settings" Style="{StaticResource SidebarButton}" Click="NavButton_Click"/>
+                    <Button x:Name="NavAbout" Content="About" Style="{StaticResource SidebarButton}" Click="NavButton_Click"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom" Margin="10,10,10,14">
+                    <Button x:Name="BtnToggleOverlay" Content="Enable Overlay" Style="{StaticResource PrimaryButton}" Click="BtnToggleOverlay_Click" Height="34"/>
+                    <TextBlock x:Name="OverlayStatusText" Text="Overlay: off" Style="{StaticResource LabelText}" Margin="4,8,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ================= CENTER ================= -->
+        <Grid Grid.Column="1">
+            <!-- Library section: preview + searchable list -->
+            <Grid x:Name="LibrarySection">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" MinHeight="220"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="2*" MinHeight="180"/>
+                </Grid.RowDefinitions>
+
+                <!-- Live preview -->
+                <Border Grid.Row="0" Background="{StaticResource BgDarkestBrush}" Margin="16,16,16,0" CornerRadius="6" BorderBrush="{StaticResource BorderBrush2}" BorderThickness="1">
+                    <Grid>
+                        <Canvas x:Name="PreviewGridCanvas" ClipToBounds="True"/>
+                        <Canvas x:Name="PreviewCanvas" ClipToBounds="False"/>
+                        <TextBlock x:Name="PreviewNameText" Text="" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="12,0,0,10" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    </Grid>
+                </Border>
+
+                <!-- Search + list -->
+                <Grid Grid.Row="2" Margin="16,8,16,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="SearchBox" Grid.Column="0" Text="" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center">
+                        </TextBox>
+                        <Button Grid.Column="1" Content="Randomize" Style="{StaticResource ActionButton}" Margin="8,0,0,0" Click="BtnRandomize_Click"/>
+                    </Grid>
+                    <ListBox x:Name="CrosshairList" Grid.Row="1" Background="Transparent" BorderThickness="0"
+                             SelectionChanged="CrosshairList_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource BgPanelBrush}" CornerRadius="4" Margin="0,3" Padding="10,8" BorderBrush="{StaticResource BorderBrush2}" BorderThickness="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Category}" Style="{StaticResource LabelText}" Margin="0"/>
+                                        </StackPanel>
+                                        <ToggleButton Grid.Column="1" Content="★" Tag="{Binding Id}" Click="FavoriteToggle_Click"
+                                                      IsChecked="{Binding IsFavorite, Mode=OneWay}"
+                                                      Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextSecondaryBrush}"
+                                                      FontSize="15" Cursor="Hand"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Grid>
+
+            <!-- Profiles section -->
+            <Grid x:Name="ProfilesSection" Visibility="Collapsed" Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="Profiles" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <Button Content="New Profile" Style="{StaticResource ActionButton}" Margin="16,0,0,0" Click="BtnNewProfile_Click"/>
+                    <Button Content="Rename" Style="{StaticResource ActionButton}" Margin="8,0,0,0" Click="BtnRenameProfile_Click"/>
+                    <Button Content="Delete" Style="{StaticResource ActionButton}" Margin="8,0,0,0" Click="BtnDeleteProfile_Click"/>
+                    <Button Content="Save Current As Profile" Style="{StaticResource ActionButton}" Margin="8,0,0,0" Click="BtnSaveProfile_Click"/>
+                    <Button Content="Export Profile" Style="{StaticResource ActionButton}" Margin="8,0,0,0" Click="BtnExportProfile_Click"/>
+                    <Button Content="Import Profile" Style="{StaticResource ActionButton}" Margin="8,0,0,0" Click="BtnImportProfile_Click"/>
+                </StackPanel>
+                <ListBox x:Name="ProfileList" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionChanged="ProfileList_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource BgPanelBrush}" CornerRadius="4" Margin="0,3" Padding="12,10" BorderBrush="{StaticResource BorderBrush2}" BorderThickness="1">
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <!-- Settings section -->
+            <ScrollViewer x:Name="SettingsSection" Visibility="Collapsed" Margin="24">
+                <StackPanel MaxWidth="560" HorizontalAlignment="Left">
+                    <TextBlock Text="Settings" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+
+                    <TextBlock Text="GENERAL" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,0,0,8"/>
+                    <CheckBox x:Name="ChkStartWithWindows" Content="Start with Windows" Margin="0,4" Click="SettingsChanged"/>
+                    <CheckBox x:Name="ChkMinimizeToTray" Content="Minimize to tray" Margin="0,4" Click="SettingsChanged"/>
+                    <CheckBox x:Name="ChkStartOverlayAuto" Content="Start overlay automatically" Margin="0,4" Click="SettingsChanged"/>
+                    <CheckBox x:Name="ChkRememberCrosshair" Content="Remember last crosshair" Margin="0,4" Click="SettingsChanged"/>
+                    <CheckBox x:Name="ChkRememberProfile" Content="Remember last profile" Margin="0,4" Click="SettingsChanged"/>
+
+                    <TextBlock Text="OVERLAY" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,20,0,8"/>
+                    <CheckBox x:Name="ChkAlwaysOnTop" Content="Always on top" Margin="0,4" Click="SettingsChanged"/>
+                    <CheckBox x:Name="ChkClickThrough" Content="Click-through" Margin="0,4" Click="SettingsChanged"/>
+                    <TextBlock Text="Monitor" Style="{StaticResource LabelText}" Margin="0,10,0,4"/>
+                    <ComboBox x:Name="MonitorCombo" Width="240" HorizontalAlignment="Left" SelectionChanged="MonitorCombo_SelectionChanged"/>
+                    <TextBlock Text="Overlay opacity" Style="{StaticResource LabelText}" Margin="0,10,0,4"/>
+                    <Slider x:Name="SliderOverlayOpacity" Minimum="0.1" Maximum="1" ValueChanged="SettingsSliderChanged" Width="240" HorizontalAlignment="Left"/>
+
+                    <TextBlock Text="HOTKEYS" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,20,0,8"/>
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Toggle Overlay" VerticalAlignment="Center"/>
+                        <TextBox x:Name="HotkeyToggleBox" Grid.Column="1" PreviewKeyDown="HotkeyBox_PreviewKeyDown" IsReadOnly="True"/>
+                    </Grid>
+                    <Grid Margin="0,6,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Next Crosshair" VerticalAlignment="Center"/>
+                        <TextBox x:Name="HotkeyNextBox" Grid.Column="1" PreviewKeyDown="HotkeyBox_PreviewKeyDown" IsReadOnly="True"/>
+                    </Grid>
+                    <Grid Margin="0,6,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Previous Crosshair" VerticalAlignment="Center"/>
+                        <TextBox x:Name="HotkeyPrevBox" Grid.Column="1" PreviewKeyDown="HotkeyBox_PreviewKeyDown" IsReadOnly="True"/>
+                    </Grid>
+                    <Grid Margin="0,6,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Hide/Show UI" VerticalAlignment="Center"/>
+                        <TextBox x:Name="HotkeyHideBox" Grid.Column="1" PreviewKeyDown="HotkeyBox_PreviewKeyDown" IsReadOnly="True"/>
+                    </Grid>
+                    <TextBlock Text="Click a field and press the new key combination." Style="{StaticResource LabelText}" Margin="0,6,0,0"/>
+
+                    <TextBlock Text="APPEARANCE" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,20,0,8"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Theme" VerticalAlignment="Center" Width="80"/>
+                        <ComboBox x:Name="ThemeCombo" Width="140" SelectionChanged="ThemeCombo_SelectionChanged">
+                            <ComboBoxItem Content="Dark"/>
+                            <ComboBoxItem Content="Light"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Button Content="Open Data Folder" Style="{StaticResource ActionButton}" Margin="0,24,0,0" HorizontalAlignment="Left" Click="BtnOpenDataFolder_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- About section -->
+            <StackPanel x:Name="AboutSection" Visibility="Collapsed" Margin="32" MaxWidth="480" HorizontalAlignment="Left">
+                <TextBlock Text="Aviation Crosshair" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                <TextBlock Text="Precision overlay utility." Margin="0,6,0,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                <TextBlock Text="Version 1.0.0" Margin="0,20,0,0"/>
+                <TextBlock Text="A lightweight, always-on-top crosshair overlay with a full preset library and live editor." Margin="0,16,0,0" TextWrapping="Wrap" Foreground="{StaticResource TextSecondaryBrush}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ================= RIGHT PANEL (editor) ================= -->
+        <Border x:Name="EditorPanel" Grid.Column="2" Background="{StaticResource BgDarkestBrush}" BorderBrush="{StaticResource BorderBrush2}" BorderThickness="1,0,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="16,16,16,16">
+                    <TextBlock x:Name="EditorTitle" Text="Select a crosshair" FontWeight="Bold" FontSize="13" Margin="0,0,0,14"/>
+
+                    <TextBlock Text="Shape" Style="{StaticResource LabelText}"/>
+                    <ComboBox x:Name="ShapeCombo" SelectionChanged="Editor_Changed" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Size" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="SizeSlider" Minimum="4" Maximum="60" ValueChanged="Editor_SliderChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Thickness" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="ThicknessSlider" Minimum="1" Maximum="10" ValueChanged="Editor_SliderChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Gap" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="GapSlider" Minimum="0" Maximum="30" ValueChanged="Editor_SliderChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Line Length" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="LineLengthSlider" Minimum="0" Maximum="40" ValueChanged="Editor_SliderChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Opacity" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="OpacitySlider" Minimum="0" Maximum="1" ValueChanged="Editor_SliderChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Rotation" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="RotationSlider" Minimum="0" Maximum="360" ValueChanged="Editor_SliderChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Lines" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,4,0,6"/>
+                    <UniformGrid Columns="2" Margin="0,0,0,12">
+                        <CheckBox x:Name="ChkTop" Content="Top" Click="Editor_Changed"/>
+                        <CheckBox x:Name="ChkBottom" Content="Bottom" Click="Editor_Changed"/>
+                        <CheckBox x:Name="ChkLeft" Content="Left" Click="Editor_Changed"/>
+                        <CheckBox x:Name="ChkRight" Content="Right" Click="Editor_Changed"/>
+                    </UniformGrid>
+                    <CheckBox x:Name="ChkRoundedCaps" Content="Rounded line caps" Click="Editor_Changed" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Center Dot" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,4,0,6"/>
+                    <CheckBox x:Name="ChkCenterDot" Content="Enable center dot" Click="Editor_Changed" Margin="0,0,0,6"/>
+                    <TextBlock Text="Dot Size" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="DotSizeSlider" Minimum="1" Maximum="10" ValueChanged="Editor_SliderChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Color" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,4,0,6"/>
+                    <WrapPanel x:Name="ColorSwatches" Margin="0,0,0,8"/>
+                    <TextBlock Text="Custom HEX" Style="{StaticResource LabelText}"/>
+                    <TextBox x:Name="HexBox" TextChanged="HexBox_TextChanged" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="Outline" Style="{StaticResource LabelText}" FontWeight="Bold" Margin="0,4,0,6"/>
+                    <CheckBox x:Name="ChkOutline" Content="Enable outline" Click="Editor_Changed" Margin="0,0,0,6"/>
+                    <TextBlock Text="Outline Thickness" Style="{StaticResource LabelText}"/>
+                    <Slider x:Name="OutlineThicknessSlider" Minimum="0" Maximum="6" ValueChanged="Editor_SliderChanged" Margin="0,0,0,6"/>
+                    <TextBlock Text="Outline HEX" Style="{StaticResource LabelText}"/>
+                    <TextBox x:Name="OutlineHexBox" TextChanged="OutlineHexBox_TextChanged" Margin="0,0,0,12"/>
+
+                    <CheckBox x:Name="ChkShadow" Content="Shadow" Click="Editor_Changed" Margin="0,0,0,6"/>
+                    <CheckBox x:Name="ChkDynamic" Content="Dynamic behavior (subtle pulse)" Click="Editor_Changed" Margin="0,0,0,16"/>
+
+                    <Separator Margin="0,0,0,14"/>
+
+                    <UniformGrid Columns="2" Rows="2">
+                        <Button Content="Apply" Style="{StaticResource ActionButton}" Margin="0,0,4,6" Click="BtnApply_Click"/>
+                        <Button Content="Save As New" Style="{StaticResource ActionButton}" Margin="4,0,0,6" Click="BtnSaveAsNew_Click"/>
+                        <Button Content="Reset" Style="{StaticResource ActionButton}" Margin="0,0,4,0" Click="BtnReset_Click"/>
+                        <Button Content="Export" Style="{StaticResource ActionButton}" Margin="4,0,0,0" Click="BtnExportCrosshair_Click"/>
+                    </UniformGrid>
+                    <Button Content="Import Crosshair" Style="{StaticResource ActionButton}" Margin="0,8,0,0" Click="BtnImportCrosshair_Click"/>
+                    <Button x:Name="BtnDeleteCustom" Content="Delete Custom Crosshair" Style="{StaticResource ActionButton}" Margin="0,8,0,0" Click="BtnDeleteCustom_Click" Visibility="Collapsed"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>
