@@ -1,0 +1,27 @@
+name: Build Aviation Crosshair
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish self-contained single-file exe
+        run: |
+          dotnet publish "AviationCrosshair.csproj" -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o dist
+
+      - name: Upload built exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: Aviation-Crosshair-exe
+          path: dist/Aviation Crosshair.exe
