@@ -58,8 +58,12 @@ namespace AviationCrosshair
             RefreshLibraryList();
             SelectInitialCrosshair();
 
-            _hotkeys = new HotkeyManager(this);
-            Loaded += (_, _) => RegisterAllHotkeys();
+            _hotkeys = null;
+            Loaded += (_, _) =>
+            {
+                _hotkeys = new HotkeyManager(this);
+                RegisterAllHotkeys();
+            };
 
             _trayService = new TrayService(LoadAppIcon());
             _trayService.ShowRequested += () => Dispatcher.Invoke(RestoreFromTray);
