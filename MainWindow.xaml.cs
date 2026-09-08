@@ -30,7 +30,7 @@ namespace AviationCrosshair
 
         private CrosshairSettings? _selectedSource;   // the stored preset/custom this editor is based on
         private CrosshairSettings _editing = new();   // live working copy driven by the editor controls
-        private bool _suppressEvents = false;
+        private bool _suppressEvents = true; // stays true until InitializeComponent + setup fully finish
 
         private OverlayWindow? _overlay;
         private bool _overlayEnabled = false;
@@ -57,6 +57,7 @@ namespace AviationCrosshair
 
             RefreshLibraryList();
             SelectInitialCrosshair();
+            _suppressEvents = false; // setup complete: editor controls now respond normally
 
             _hotkeys = null;
             Loaded += (_, _) =>
