@@ -28,7 +28,11 @@ namespace AviationCrosshair.Overlay
         public OverlayWindow()
         {
             InitializeComponent();
-            SourceInitialized += (_, _) => ApplyClickThrough(true);
+            // Click-through is applied explicitly by MainWindow right after
+            // Show() (see ToggleOverlay()), once WPF has fully established its
+            // own transparency/composition for this window. Applying it earlier
+            // (e.g. on SourceInitialized) was interfering with WPF's alpha
+            // blending and causing washed-out colors in the overlay.
         }
 
         /// <summary>
@@ -44,10 +48,15 @@ namespace AviationCrosshair.Overlay
             if (hwnd == IntPtr.Zero) return;
 
             int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            // Only touch the TRANSPARENT (click-through) and TOOLWINDOW (hide from
+            // Alt-Tab) bits. Deliberately never set/clear WS_EX_LAYERED ourselves -
+            // WPF already manages that bit internally for AllowsTransparency
+            // windows, and re-asserting it here was corrupting WPF's own alpha
+            // compositing (causing washed-out/wrong colors in the overlay).
             if (enabled)
-                exStyle |= WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW;
+                exStyle |= WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW;
             else
-                exStyle = (exStyle | WS_EX_LAYERED | WS_EX_TOOLWINDOW) & ~WS_EX_TRANSPARENT;
+                exStyle = (exStyle | WS_EX_TOOLWINDOW) & ~WS_EX_TRANSPARENT;
 
             SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
             _clickThroughApplied = enabled;
@@ -63,19 +72,20 @@ namespace AviationCrosshair.Overlay
             double w = Math.Max(1, bounds.Width + pad * 2);
             double h = Math.Max(1, bounds.Height + pad * 2);
 
-            var visual = new DrawingVisual();
-            using (var dc = visual.RenderOpen())
+            // Draw as a vector image (DrawingImage), NOT a rasterized bitmap.
+            // This keeps the overlay perfectly sharp and color-accurate at any
+            // Windows display scaling (100%/125%/150%/etc.) instead of being
+            // resampled/blurred like a fixed-DPI bitmap would be.
+            var offsetGroup = new DrawingGroup();
+            using (var dc = offsetGroup.Open())
             {
                 dc.PushTransform(new TranslateTransform(w / 2 - bounds.X - bounds.Width / 2, h / 2 - bounds.Y - bounds.Height / 2));
                 dc.DrawDrawing(group);
                 dc.Pop();
             }
+            offsetGroup.Freeze();
 
-            var rtb = new RenderTargetBitmap((int)Math.Ceiling(w), (int)Math.Ceiling(h), 96, 96, PixelFormats.Pbgra32);
-            rtb.Render(visual);
-            rtb.Freeze();
-
-            CrosshairImage.Source = rtb;
+            CrosshairImage.Source = new DrawingImage(offsetGroup);
             Width = w;
             Height = h;
         }

@@ -100,6 +100,32 @@
                 <Setter Property="Margin" Value="0,0,0,4"/>
             </Style>
 
+            <!-- Removes the native Windows blue selection box from list items,
+                 so our own custom dark card styling (defined per-item in the
+                 DataTemplate) is the only thing visible, with just a subtle
+                 accent-colored left edge to show selection. -->
+            <Style TargetType="ListBoxItem">
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ListBoxItem">
+                            <Border Background="Transparent" Padding="0">
+                                <ContentPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="ListBox">
+                <Setter Property="Padding" Value="0"/>
+            </Style>
+
             <Style TargetType="Slider">
                 <Setter Property="Height" Value="20"/>
             </Style>

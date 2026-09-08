@@ -73,7 +73,22 @@
                              SelectionChanged="CrosshairList_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{StaticResource BgPanelBrush}" CornerRadius="4" Margin="0,3" Padding="10,8" BorderBrush="{StaticResource BorderBrush2}" BorderThickness="1">
+                                <Border CornerRadius="4" Margin="0,3" Padding="10,8" BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="{StaticResource BgPanelBrush}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush2}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                                    <Setter Property="Background" Value="#26314A5A"/>
+                                                    <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource BgHoverBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -113,7 +128,22 @@
                 <ListBox x:Name="ProfileList" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionChanged="ProfileList_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="{StaticResource BgPanelBrush}" CornerRadius="4" Margin="0,3" Padding="12,10" BorderBrush="{StaticResource BorderBrush2}" BorderThickness="1">
+                            <Border CornerRadius="4" Margin="0,3" Padding="12,10" BorderThickness="1">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource BgPanelBrush}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush2}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                                <Setter Property="Background" Value="#26314A5A"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource BgHoverBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
                             </Border>
                         </DataTemplate>
